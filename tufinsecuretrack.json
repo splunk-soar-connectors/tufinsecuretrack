@@ -1048,7 +1048,7 @@
                 "protocol": {
                     "description": "Protocol (Default: Any)",
                     "data_type": "string",
-                    "order": 3,
+                    "order": 2,
                     "value_list": [
                         "Any",
                         "TCP",
@@ -1059,7 +1059,7 @@
                 "port": {
                     "description": "Port",
                     "data_type": "numeric",
-                    "order": 4,
+                    "order": 3,
                     "contains": [
                         "port"
                     ]
