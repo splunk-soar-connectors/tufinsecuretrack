@@ -12,7 +12,7 @@
     "product_vendor": "Tufin",
     "product_name": "Tufin SecureTrack",
     "product_version_regex": ".*",
-    "min_phantom_version": "3.0.180",
+    "min_phantom_version": "3.5.180",
     "logo": "logo_tufin.svg",
     "logo_dark": "logo_tufin_dark.svg",
     "configuration": {
