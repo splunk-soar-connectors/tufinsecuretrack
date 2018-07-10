@@ -367,6 +367,14 @@ class TufinSecureTrackConnector(BaseConnector):
         port = param.get(consts.TUFINSECURETRACK_JSON_PORT)
 
         if port:
+            try:
+                port = int(port)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, "Invalid port value.")
+
+            if (port < 0):
+                return action_result.set_status(phantom.APP_ERROR, "Port values cannot be negative numbers. Please specify a valid port value.")
+
             protocol = "{}:{}".format(protocol, port)
 
         # Set params to get firewall rules that allow traffic
