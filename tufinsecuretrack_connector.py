@@ -1,5 +1,5 @@
 # File: tufinsecuretrack_connector.py
-# Copyright (c) 2017-2018 Splunk Inc.
+# Copyright (c) 2017-2021 Splunk Inc.
 #
 # SPLUNK CONFIDENTIAL Use or disclosure of this material in whole or in part
 # without a valid written license from Splunk Inc. is PROHIBITED.
@@ -101,7 +101,7 @@ class TufinSecureTrackConnector(BaseConnector):
         if net_mask:
             if len(net_mask) <= 3:
                 # Check if net mask is out of range
-                if "." in ip and int(net_mask) not in range(0, 33):
+                if "." in ip and int(net_mask) not in list(range(0, 33)):
                     self.debug_print(consts.TUFINSECURETRACK_IP_VALIDATION_FAILED)
                     return False
             else:
@@ -241,7 +241,7 @@ class TufinSecureTrackConnector(BaseConnector):
         except:
             error_text = "Cannot parse error details"
 
-        error_text = ''.join(filter(lambda x: x in string.printable, error_text))
+        error_text = ''.join([x for x in error_text if x in string.printable])
         message = "{0}\n".format(error_text)
 
         message = message.replace('{', '{{').replace('}', '}}')
@@ -303,7 +303,7 @@ class TufinSecureTrackConnector(BaseConnector):
         rules_list = []
         is_blocked = False
 
-        for network_id, device_id in network_ids.items():
+        for network_id, device_id in list(network_ids.items()):
             # Getting rules that IP/subnet falls in
             res_rule_status, rule_response = self._make_rest_call(consts.TUFINSECURETRACK_NETWORK_RULES_ENDPOINT.format(
                 id=network_id), action_result)
@@ -543,14 +543,15 @@ if __name__ == '__main__':
 
     pudb.set_trace()
     if len(sys.argv) < 2:
-        print 'No test json specified as input'
+        print('No test json specified as input')
         exit(0)
     with open(sys.argv[1]) as f:
         in_json = f.read()
         in_json = json.loads(in_json)
-        print json.dumps(in_json, indent=4)
+        print(json.dumps(in_json, indent=4))
         connector = TufinSecureTrackConnector()
         connector.print_progress_message = True
         return_value = connector._handle_action(json.dumps(in_json), None)
-        print json.dumps(json.loads(return_value), indent=4)
+        print(json.dumps(json.loads(return_value), indent=4))
+
     exit(0)

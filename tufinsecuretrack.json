@@ -4,16 +4,20 @@
     "description": "This app supports investigative actions on Tufin SecureTrack",
     "publisher": "Phantom",
     "package_name": "phantom_tufinsecuretrack",
-    "license": "Copyright (c) 2017-2018 Splunk Inc.",
-    "main_module": "tufinsecuretrack_connector.pyc",
+    "license": "Copyright (c) 2017-2021 Splunk Inc.",
+    "main_module": "tufinsecuretrack_connector.py",
     "type": "network security",
-    "app_version": "1.0.9",
+    "app_version": "2.0.0",
     "utctime_updated": "2018-12-07T01:28:20.000000Z",
     "product_vendor": "Tufin",
     "product_name": "Tufin SecureTrack",
     "product_version_regex": ".*",
-    "min_phantom_version": "3.5.180",
+    "min_phantom_version": "4.9.39220",
     "logo": "logo_tufin.svg",
+    "python_version": "3",
+    "latest_tested_versions": [
+        "On on prem, tested on 16th June 2021"
+    ],
     "logo_dark": "logo_tufin_dark.svg",
     "configuration": {
         "url": {
@@ -83,7 +87,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -410,7 +415,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.binding.from_zone.*.global",
-                    "data_type": "string",
+                    "data_type": "boolean",
                     "example_values": [
                         false,
                         true
@@ -1077,7 +1082,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -1512,7 +1518,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.binding.from_zone.*.global",
-                    "data_type": "string",
+                    "data_type": "boolean",
                     "example_values": [
                         false,
                         true
