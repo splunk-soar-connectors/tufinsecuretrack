@@ -263,7 +263,7 @@ class TufinSecureTrackConnector(BaseConnector):
         self.save_progress("Configured URL: {}{}".format(self._url, consts.TUFINSECURETRACK_TEST_CONNECTIVITY_ENDPOINT))
 
         # making call
-        ret_value, response = self._make_rest_call(consts.TUFINSECURETRACK_TEST_CONNECTIVITY_ENDPOINT, action_result,
+        ret_value, _ = self._make_rest_call(consts.TUFINSECURETRACK_TEST_CONNECTIVITY_ENDPOINT, action_result,
                                                    timeout=30)
 
         # something went wrong
