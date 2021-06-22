@@ -2,7 +2,7 @@
     "appid": "019d0b7d-8b9f-443d-a828-5b99c0553a24",
     "name": "Tufin SecureTrack",
     "description": "This app supports investigative actions on Tufin SecureTrack",
-    "publisher": "Phantom",
+    "publisher": "Splunk",
     "package_name": "phantom_tufinsecuretrack",
     "license": "Copyright (c) 2018-2021 Splunk Inc.",
     "main_module": "tufinsecuretrack_connector.py",
