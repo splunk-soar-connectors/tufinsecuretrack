@@ -2,19 +2,23 @@
     "appid": "019d0b7d-8b9f-443d-a828-5b99c0553a24",
     "name": "Tufin SecureTrack",
     "description": "This app supports investigative actions on Tufin SecureTrack",
-    "publisher": "Phantom",
+    "publisher": "Splunk",
     "package_name": "phantom_tufinsecuretrack",
-    "license": "Copyright (c) 2017-2018 Splunk Inc.",
-    "main_module": "tufinsecuretrack_connector.pyc",
+    "license": "Copyright (c) 2018-2021 Splunk Inc.",
+    "main_module": "tufinsecuretrack_connector.py",
     "type": "network security",
-    "app_version": "1.0.7",
-    "utctime_updated": "2018-07-10T00:29:19.000000Z",
+    "app_version": "2.0.1",
+    "utctime_updated": "2021-06-23T01:46:14.000000Z",
     "product_vendor": "Tufin",
     "product_name": "Tufin SecureTrack",
     "product_version_regex": ".*",
-    "min_phantom_version": "3.5.180",
+    "min_phantom_version": "4.9.39220",
     "logo": "logo_tufin.svg",
     "logo_dark": "logo_tufin_dark.svg",
+    "python_version": "3",
+    "latest_tested_versions": [
+        "SecureTrack version 16.2 HF2 build 77043, TufinOS Release 2.11 build 891"
+    ],
     "configuration": {
         "url": {
             "required": true,
@@ -83,7 +87,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -410,7 +415,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.binding.from_zone.*.global",
-                    "data_type": "string",
+                    "data_type": "boolean",
                     "example_values": [
                         false,
                         true
@@ -557,7 +562,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.binding.to_zone.*.global",
-                    "data_type": "string",
+                    "data_type": "boolean",
                     "example_values": [
                         false,
                         true
@@ -615,10 +620,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.cp_uid",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.dest_networks_negated",
@@ -784,10 +786,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.name",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.option",
@@ -1062,7 +1061,8 @@
                     "order": 3,
                     "contains": [
                         "port"
-                    ]
+                    ],
+                    "primary": true
                 }
             },
             "render": {
@@ -1077,7 +1077,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -1512,7 +1513,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.binding.from_zone.*.global",
-                    "data_type": "string",
+                    "data_type": "boolean",
                     "example_values": [
                         false,
                         true
@@ -1666,7 +1667,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.binding.to_zone.*.global",
-                    "data_type": "string"
+                    "data_type": "boolean"
                 },
                 {
                     "data_path": "action_result.data.*.binding.to_zone.*.id",
@@ -1707,17 +1708,14 @@
                 },
                 {
                     "data_path": "action_result.data.*.comment",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "example_values": [
                         2
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.cp_uid",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.dest_networks_negated",
