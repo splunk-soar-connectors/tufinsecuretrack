@@ -14,18 +14,16 @@
 # and limitations under the License.
 #
 #
-# Standard library imports
 import json
 import re
+import string
+
+import phantom.app as phantom
 import requests
 import xmltodict
-import string
 from bs4 import BeautifulSoup
-
-# Phantom imports
-import phantom.app as phantom
-from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
+from phantom.base_connector import BaseConnector
 
 # Local imports
 import tufinsecuretrack_consts as consts
@@ -549,6 +547,7 @@ class TufinSecureTrackConnector(BaseConnector):
 if __name__ == '__main__':
 
     import sys
+
     import pudb
 
     pudb.set_trace()
