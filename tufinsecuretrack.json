@@ -16,6 +16,7 @@
     "logo": "logo_tufin.svg",
     "logo_dark": "logo_tufin_dark.svg",
     "python_version": "3",
+    "fips_compliant":true,
     "latest_tested_versions": [
         "SecureTrack version 16.2 HF2 build 77043, TufinOS Release 2.11 build 891"
     ],
@@ -1021,7 +1022,7 @@
         {
             "action": "trace route",
             "description": "Check connectivity between source and destination network",
-            "verbose": "One of the <b>source_ip</b> or <b>destination_ip</b> parameters need to be specified. If <b>source_ip</b> or <b>destination_ip</b> parameter is not specified, the action will use 'Any'. This action returns a list of all enabled rules, which matches the specified source and destination network. The rules are sorted according to rule order. <br/>Supported <b>protocol</b>: <ul><li>Any</li><li>TCP</li><li>UDP</li><li>ICMP</li></ul>",
+            "verbose": "One of the <b>source_ip</b> or <b>destination_ip</b> parameters need to be specified. If <b>source_ip</b> or <b>destination_ip</b> parameter is not specified, the action will use 'Any'. This action returns a list of all enabled rules, which matches the specified source and destination network. The rules are sorted according to rule order. <br/>Supported <b>protocol</b>: <ul><li>Any</li><li>TCP</li><li>UDP</li><li>ICMP</li></ul>.",
             "type": "investigate",
             "identifier": "check_connectivity",
             "read_only": true,
