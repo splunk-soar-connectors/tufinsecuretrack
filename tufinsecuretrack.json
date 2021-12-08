@@ -7,8 +7,8 @@
     "license": "Copyright (c) 2018-2021 Splunk Inc.",
     "main_module": "tufinsecuretrack_connector.py",
     "type": "network security",
-    "app_version": "2.0.1",
-    "utctime_updated": "2021-06-23T01:46:14.000000Z",
+    "app_version": "2.0.2",
+    "utctime_updated": "2021-12-08T17:42:13.000000Z",
     "product_vendor": "Tufin",
     "product_name": "Tufin SecureTrack",
     "product_version_regex": ".*",
@@ -16,7 +16,7 @@
     "logo": "logo_tufin.svg",
     "logo_dark": "logo_tufin_dark.svg",
     "python_version": "3",
-    "fips_compliant":true,
+    "fips_compliant": true,
     "latest_tested_versions": [
         "SecureTrack version 16.2 HF2 build 77043, TufinOS Release 2.11 build 891"
     ],
