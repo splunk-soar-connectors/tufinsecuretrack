@@ -4,11 +4,11 @@
     "description": "This app supports investigative actions on Tufin SecureTrack",
     "publisher": "Splunk",
     "package_name": "phantom_tufinsecuretrack",
-    "license": "Copyright (c) 2018-2021 Splunk Inc.",
+    "license": "Copyright (c) 2018-2022 Splunk Inc.",
     "main_module": "tufinsecuretrack_connector.py",
     "type": "network security",
-    "app_version": "2.0.2",
-    "utctime_updated": "2021-06-29T04:35:13.000000Z",
+    "app_version": "2.0.4",
+    "utctime_updated": "2022-01-14T21:45:42.000000Z",
     "product_vendor": "Tufin",
     "product_name": "Tufin SecureTrack",
     "product_version_regex": ".*",
@@ -16,6 +16,7 @@
     "logo": "logo_tufin.svg",
     "logo_dark": "logo_tufin_dark.svg",
     "python_version": "3",
+    "fips_compliant": true,
     "latest_tested_versions": [
         "SecureTrack version 16.2 HF2 build 77043, TufinOS Release 2.11 build 891"
     ],
@@ -1021,7 +1022,7 @@
         {
             "action": "trace route",
             "description": "Check connectivity between source and destination network",
-            "verbose": "One of the <b>source_ip</b> or <b>destination_ip</b> parameters need to be specified. If <b>source_ip</b> or <b>destination_ip</b> parameter is not specified, the action will use 'Any'. This action returns a list of all enabled rules, which matches the specified source and destination network. The rules are sorted according to rule order. <br/>Supported <b>protocol</b>: <ul><li>Any</li><li>TCP</li><li>UDP</li><li>ICMP</li></ul>",
+            "verbose": "One of the <b>source_ip</b> or <b>destination_ip</b> parameters need to be specified. If <b>source_ip</b> or <b>destination_ip</b> parameter is not specified, the action will use 'Any'. This action returns a list of all enabled rules, which matches the specified source and destination network. The rules are sorted according to rule order. <br/>Supported <b>protocol</b>: <ul><li>Any</li><li>TCP</li><li>UDP</li><li>ICMP</li></ul>.",
             "type": "investigate",
             "identifier": "check_connectivity",
             "read_only": true,
@@ -2075,5 +2076,41 @@
             ],
             "versions": "EQ(*)"
         }
-    ]
+    ],
+    "pip_dependencies": {
+        "wheel": [
+            {
+                "module": "beautifulsoup4",
+                "input_file": "wheels/beautifulsoup4-4.9.1-py3-none-any.whl"
+            },
+            {
+                "module": "certifi",
+                "input_file": "wheels/certifi-2021.10.8-py2.py3-none-any.whl"
+            },
+            {
+                "module": "chardet",
+                "input_file": "wheels/chardet-3.0.4-py2.py3-none-any.whl"
+            },
+            {
+                "module": "idna",
+                "input_file": "wheels/idna-2.10-py2.py3-none-any.whl"
+            },
+            {
+                "module": "requests",
+                "input_file": "wheels/requests-2.25.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "soupsieve",
+                "input_file": "wheels/soupsieve-2.3.1-py3-none-any.whl"
+            },
+            {
+                "module": "urllib3",
+                "input_file": "wheels/urllib3-1.26.8-py2.py3-none-any.whl"
+            },
+            {
+                "module": "xmltodict",
+                "input_file": "wheels/xmltodict-0.12.0-py2.py3-none-any.whl"
+            }
+        ]
+    }
 }
