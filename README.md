@@ -2,7 +2,7 @@
 # Tufin SecureTrack
 
 Publisher: Splunk  
-Connector Version: 2\.0\.2  
+Connector Version: 2\.0\.4  
 Product Vendor: Tufin  
 Product Name: Tufin SecureTrack  
 Product Version Supported (regex): "\.\*"  
