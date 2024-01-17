@@ -216,7 +216,7 @@ class TufinSecureTrackConnector(BaseConnector):
             return phantom.APP_SUCCESS, response_data
 
         # If response code is unknown
-        message = consts.TUFINSECURETRACK_REST_RESP_OTHER_ERROR_MSG
+        message = consts.TUFINSECURETRACK_REST_RESP_OTHER_ERR_MSG
 
         # overriding message if available in response
         if isinstance(response_data, dict):
