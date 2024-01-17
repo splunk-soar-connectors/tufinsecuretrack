@@ -277,7 +277,7 @@ class TufinSecureTrackConnector(BaseConnector):
         # something went wrong
         if phantom.is_fail(ret_value):
             self.save_progress(action_result.get_message())
-            self.set_status(phantom.APP_ERROR, consts.TUFINSECURETRACK_TEST_CONNECTIVITY_FAIL)
+            self.set_status(phantom.APP_ERROR, consts.TUFINSECURETRACK_TEST_CONNECTIVITY_FAILED)
             return action_result.get_status()
 
         self.set_status_save_progress(phantom.APP_SUCCESS, consts.TUFINSECURETRACK_TEST_CONNECTIVITY_PASS)
