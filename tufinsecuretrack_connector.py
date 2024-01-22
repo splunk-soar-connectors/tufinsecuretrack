@@ -1,6 +1,6 @@
 # File: tufinsecuretrack_connector.py
 #
-# Copyright (c) 2018-2022 Splunk Inc.
+# Copyright (c) 2018-2024 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -216,7 +216,7 @@ class TufinSecureTrackConnector(BaseConnector):
             return phantom.APP_SUCCESS, response_data
 
         # If response code is unknown
-        message = consts.TUFINSECURETRACK_REST_RESP_OTHER_ERROR_MSG
+        message = consts.TUFINSECURETRACK_REST_RESP_OTHER_ERR_MSG
 
         # overriding message if available in response
         if isinstance(response_data, dict):
@@ -277,7 +277,7 @@ class TufinSecureTrackConnector(BaseConnector):
         # something went wrong
         if phantom.is_fail(ret_value):
             self.save_progress(action_result.get_message())
-            self.set_status(phantom.APP_ERROR, consts.TUFINSECURETRACK_TEST_CONNECTIVITY_FAIL)
+            self.set_status(phantom.APP_ERROR, consts.TUFINSECURETRACK_TEST_CONNECTIVITY_FAILED)
             return action_result.get_status()
 
         self.set_status_save_progress(phantom.APP_SUCCESS, consts.TUFINSECURETRACK_TEST_CONNECTIVITY_PASS)

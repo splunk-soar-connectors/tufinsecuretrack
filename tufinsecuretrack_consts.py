@@ -1,6 +1,6 @@
 # File: tufinsecuretrack_consts.py
 #
-# Copyright (c) 2018-2022 Splunk Inc.
+# Copyright (c) 2018-2024 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ TUFINSECURETRACK_ERR_SERVER_CONNECTION = "Connection failed"
 TUFINSECURETRACK_ERR_JSON_PARSE = "Unable to parse the response into a dictionary.\nResponse text - {raw_text}"
 TUFINSECURETRACK_ERR_FROM_SERVER = "API failed.\nStatus code: {status}\nDetail: {detail}"
 TUFINSECURETRACK_REST_RESPONSE = "response"
-TUFINSECURETRACK_REST_RESP_OTHER_ERROR_MSG = "Error returned"
+TUFINSECURETRACK_REST_RESP_OTHER_ERR_MSG = "Error returned"
 TUFINSECURETRACK_REST_RESP_SUCCESS = 200
 TUFINSECURETRACK_REST_RESP_BAD_REQUEST = 400
 TUFINSECURETRACK_REST_RESP_BAD_REQUEST_MSG = "Parameters are invalid"
@@ -33,7 +33,7 @@ TUFINSECURETRACK_REST_RESP_FORBIDDEN_MSG = "Forbidden."
 TUFINSECURETRACK_REST_RESP_NOT_FOUND = 404
 TUFINSECURETRACK_REST_RESP_NOT_FOUND_MSG = "Resource not found."
 TUFINSECURETRACK_CONNECTION_TEST_MSG = "Querying endpoint to verify the credentials provided"
-TUFINSECURETRACK_TEST_CONNECTIVITY_FAIL = "Connectivity test failed"
+TUFINSECURETRACK_TEST_CONNECTIVITY_FAILED = "Connectivity test failed"
 TUFINSECURETRACK_TEST_CONNECTIVITY_PASS = "Connectivity test succeeded"
 TUFINSECURETRACK_JSON_IP_ADDRESS = "ip"
 TUFINSECURETRACK_IP_VALIDATION_FAILED = "parameter 'ip_address' validation failed"
