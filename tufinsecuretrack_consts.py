@@ -14,7 +14,7 @@
 # and limitations under the License.
 TUFINSECURETRACK_CONFIG_URL = "url"
 TUFINSECURETRACK_CONFIG_USERNAME = "username"
-TUFINSECURETRACK_CONFIG_PASSWORD = "password" # pragma: allowlist secret
+TUFINSECURETRACK_CONFIG_PASSWORD = "password"  # pragma: allowlist secret
 TUFINSECURETRACK_CONFIG_VERIFY_SSL = "verify_server_cert"
 TUFINSECURETRACK_ERR_API_UNSUPPORTED_METHOD = "Unsupported method {method}"
 TUFINSECURETRACK_EXCEPTION_OCCURRED = "Exception occurred"
