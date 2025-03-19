@@ -1,6 +1,6 @@
 # File: tufinsecuretrack_connector.py
 #
-# Copyright (c) 2018-2024 Splunk Inc.
+# Copyright (c) 2018-2025 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,17 +28,18 @@ from phantom.base_connector import BaseConnector
 # Local imports
 import tufinsecuretrack_consts as consts
 
+
 # Dictionary that maps each error code with its corresponding message
 ERROR_RESPONSE_DICT = {
     consts.TUFINSECURETRACK_REST_RESP_UNAUTHORIZED: consts.TUFINSECURETRACK_REST_RESP_UNAUTHORIZED_MSG,
     consts.TUFINSECURETRACK_REST_RESP_BAD_REQUEST: consts.TUFINSECURETRACK_REST_RESP_BAD_REQUEST_MSG,
     consts.TUFINSECURETRACK_REST_RESP_NOT_FOUND: consts.TUFINSECURETRACK_REST_RESP_NOT_FOUND_MSG,
-    consts.TUFINSECURETRACK_REST_RESP_FORBIDDEN: consts.TUFINSECURETRACK_REST_RESP_FORBIDDEN_MSG
+    consts.TUFINSECURETRACK_REST_RESP_FORBIDDEN: consts.TUFINSECURETRACK_REST_RESP_FORBIDDEN_MSG,
 }
 
 
 def _break_ip_address(cidr_ip_address):
-    """ Function divides the input parameter into IP address and network mask.
+    """Function divides the input parameter into IP address and network mask.
 
     :param cidr_ip_address: IP address in format of IP/prefix_size
     :return: IP, prefix_size
@@ -54,14 +55,13 @@ def _break_ip_address(cidr_ip_address):
 
 
 class TufinSecureTrackConnector(BaseConnector):
-    """ This is an AppConnector class that inherits the BaseConnector class. It implements various actions supported by
+    """This is an AppConnector class that inherits the BaseConnector class. It implements various actions supported by
     tufin and helper methods required to run the actions.
     """
 
     def __init__(self):
-
         # Calling the BaseConnector's init function
-        super(TufinSecureTrackConnector, self).__init__()
+        super().__init__()
         self._url = None
         self._username = None
         self._password = None
@@ -70,7 +70,7 @@ class TufinSecureTrackConnector(BaseConnector):
         return
 
     def initialize(self):
-        """ This is an optional function that can be implemented by the AppConnector derived class. Since the
+        """This is an optional function that can be implemented by the AppConnector derived class. Since the
         configuration dictionary is already validated by the time this function is called, it's a good place to do any
         extra initialization of any internal modules. This function MUST return a value of either phantom.APP_SUCCESS or
         phantom.APP_ERROR. If this function returns phantom.APP_ERROR, then AppConnector::handle_action will not get
@@ -84,12 +84,12 @@ class TufinSecureTrackConnector(BaseConnector):
         self._verify_server_cert = config.get(consts.TUFINSECURETRACK_CONFIG_VERIFY_SSL, False)
 
         # Custom validation for IP address
-        self.set_validator('ip', self._is_ip)
+        self.set_validator("ip", self._is_ip)
 
         return phantom.APP_SUCCESS
 
     def _is_ip(self, cidr_ip_address):
-        """ Function that checks given address and return True if address is valid IPv4 address.
+        """Function that checks given address and return True if address is valid IPv4 address.
 
         :param cidr_ip_address: IP address
         :return: status (success/failure)
@@ -115,15 +115,16 @@ class TufinSecureTrackConnector(BaseConnector):
             else:
                 # Regex to validate the subnet
                 reg_exp = re.compile(
-                    '^((128|192|224|240|248|252|254).0.0.0)|(255.(((0|128|192|224|240|248|252|254).0.0)'
-                    '|(255.(((0|128|192|224|240|248|252|254).0)|255.(0|128|192|224|240|248|252|254|255)))'
-                    '))$')
+                    "^((128|192|224|240|248|252|254).0.0.0)|(255.(((0|128|192|224|240|248|252|254).0.0)"
+                    "|(255.(((0|128|192|224|240|248|252|254).0)|255.(0|128|192|224|240|248|252|254|255)))"
+                    "))$"
+                )
                 if not reg_exp.match(net_mask):
                     return False
         return True
 
     def _make_rest_call(self, endpoint, action_result, params=None, method="get", timeout=None):
-        """ Function that makes the REST call to the device. It is a generic function that can be called from various
+        """Function that makes the REST call to the device. It is a generic function that can be called from various
         action handlers.
 
         :param endpoint: REST endpoint that needs to appended to the service address
@@ -142,42 +143,41 @@ class TufinSecureTrackConnector(BaseConnector):
             self.debug_print(consts.TUFINSECURETRACK_ERR_API_UNSUPPORTED_METHOD.format(method=method))
             # set the action_result status to error, the handler function will most probably return as is
             return action_result.set_status(
-                phantom.APP_ERROR,
-                consts.TUFINSECURETRACK_ERR_API_UNSUPPORTED_METHOD.format(method=method)), response_data
+                phantom.APP_ERROR, consts.TUFINSECURETRACK_ERR_API_UNSUPPORTED_METHOD.format(method=method)
+            ), response_data
         except Exception as e:
             self.debug_print(consts.TUFINSECURETRACK_EXCEPTION_OCCURRED, e)
             # set the action_result status to error, the handler function will most probably return as is
-            return action_result.set_status(
-                phantom.APP_ERROR, consts.TUFINSECURETRACK_EXCEPTION_OCCURRED, e), response_data
+            return action_result.set_status(phantom.APP_ERROR, consts.TUFINSECURETRACK_EXCEPTION_OCCURRED, e), response_data
 
         # Make the call
         try:
-            response = request_func("{}{}".format(self._url, endpoint), params=params, auth=(
-                self._username, self._password), verify=self._verify_server_cert, timeout=timeout)
+            response = request_func(
+                f"{self._url}{endpoint}", params=params, auth=(self._username, self._password), verify=self._verify_server_cert, timeout=timeout
+            )
 
             # store the r_text in debug data, it will get dumped in the logs if an error occurs
-            if hasattr(action_result, 'add_debug_data'):
+            if hasattr(action_result, "add_debug_data"):
                 if response is not None:
-                    action_result.add_debug_data({'r_status_code': response.status_code})
-                    action_result.add_debug_data({'r_text': response.text})
-                    action_result.add_debug_data({'r_headers': response.headers})
+                    action_result.add_debug_data({"r_status_code": response.status_code})
+                    action_result.add_debug_data({"r_text": response.text})
+                    action_result.add_debug_data({"r_headers": response.headers})
                 else:
-                    action_result.add_debug_data({'r_text': 'r is None'})
+                    action_result.add_debug_data({"r_text": "r is None"})
 
         except Exception as e:
             self.debug_print(consts.TUFINSECURETRACK_ERR_SERVER_CONNECTION, e)
             # set the action_result status to error, the handler function will most probably return as is
-            return action_result.set_status(
-                phantom.APP_ERROR, consts.TUFINSECURETRACK_ERR_SERVER_CONNECTION, e), response_data
+            return action_result.set_status(phantom.APP_ERROR, consts.TUFINSECURETRACK_ERR_SERVER_CONNECTION, e), response_data
 
         # Try parsing the json
         try:
-            content_type = response.headers.get('content-type', "")
-            if 'json' in content_type:
+            content_type = response.headers.get("content-type", "")
+            if "json" in content_type:
                 response_data = response.json()
-            elif 'xml' in content_type:
+            elif "xml" in content_type:
                 response_data = xmltodict.parse(response.text)
-            elif 'html' in content_type:
+            elif "html" in content_type:
                 response_data = self._process_html_response(response)
             else:
                 response_data = response.text
@@ -195,24 +195,20 @@ class TufinSecureTrackConnector(BaseConnector):
             if isinstance(response_data, dict):
                 message = response_data.get("result", {}).get("message", message)
 
-            self.debug_print(consts.TUFINSECURETRACK_ERR_FROM_SERVER.format(status=response.status_code,
-                                                                            detail=message))
+            self.debug_print(consts.TUFINSECURETRACK_ERR_FROM_SERVER.format(status=response.status_code, detail=message))
             # set the action_result status to error, the handler function will most probably return as is
-            return action_result.set_status(phantom.APP_ERROR, consts.TUFINSECURETRACK_ERR_FROM_SERVER,
-                                            status=response.status_code, detail=message), response_data
+            return action_result.set_status(
+                phantom.APP_ERROR, consts.TUFINSECURETRACK_ERR_FROM_SERVER, status=response.status_code, detail=message
+            ), response_data
 
         # In case of success scenario
         if response.status_code == consts.TUFINSECURETRACK_REST_RESP_SUCCESS:
-
             # If response obtained is not in json format
             if not isinstance(response_data, dict):
                 self.debug_print(consts.TUFINSECURETRACK_UNEXPECTED_RESPONSE)
-                return action_result.set_status(phantom.APP_ERROR, consts.TUFINSECURETRACK_UNEXPECTED_RESPONSE), \
-                    response_data
+                return action_result.set_status(phantom.APP_ERROR, consts.TUFINSECURETRACK_UNEXPECTED_RESPONSE), response_data
 
-            response_data = {
-                consts.TUFINSECURETRACK_REST_RESPONSE: response_data
-            }
+            response_data = {consts.TUFINSECURETRACK_REST_RESPONSE: response_data}
             return phantom.APP_SUCCESS, response_data
 
         # If response code is unknown
@@ -223,16 +219,15 @@ class TufinSecureTrackConnector(BaseConnector):
             message = response_data.get("result", {}).get("message", message)
 
         # If response code is unknown
-        self.debug_print(consts.TUFINSECURETRACK_ERR_FROM_SERVER.format(
-            status=response.status_code, detail=message))
+        self.debug_print(consts.TUFINSECURETRACK_ERR_FROM_SERVER.format(status=response.status_code, detail=message))
         # All other response codes from REST call
         # Set the action_result status to error, the handler function will most probably return as is
-        return action_result.set_status(phantom.APP_ERROR, consts.TUFINSECURETRACK_ERR_FROM_SERVER,
-                                        status=response.status_code,
-                                        detail=message), response_data
+        return action_result.set_status(
+            phantom.APP_ERROR, consts.TUFINSECURETRACK_ERR_FROM_SERVER, status=response.status_code, detail=message
+        ), response_data
 
     def _process_html_response(self, response):
-        """ This function is used to parse html response.
+        """This function is used to parse html response.
 
         :param response: actual response
         :return: error message
@@ -243,23 +238,23 @@ class TufinSecureTrackConnector(BaseConnector):
         try:
             soup = BeautifulSoup(response.text, "html.parser")
             error_text = soup.text
-            split_lines = error_text.split('\n')
+            split_lines = error_text.split("\n")
             split_lines = [x.strip() for x in split_lines if x.strip()]
-            error_text = '\n'.join(split_lines)
+            error_text = "\n".join(split_lines)
         except:
             error_text = "Cannot parse error details"
 
-        error_text = ''.join([x for x in error_text if x in string.printable])
-        message = "{0}\n".format(error_text)
+        error_text = "".join([x for x in error_text if x in string.printable])
+        message = f"{error_text}\n"
 
-        message = message.replace('{', '{{').replace('}', '}}')
+        message = message.replace("{", "{{").replace("}", "}}")
 
         message = {"result": {"message": message}}
 
         return message
 
     def _test_asset_connectivity(self, param):
-        """ This function tests the connectivity of an asset with given credentials.
+        """This function tests the connectivity of an asset with given credentials.
 
         :param param: (not used in this method)
         :return: status success/failure
@@ -268,11 +263,10 @@ class TufinSecureTrackConnector(BaseConnector):
         action_result = ActionResult()
 
         self.save_progress(consts.TUFINSECURETRACK_CONNECTION_TEST_MSG)
-        self.save_progress("Configured URL: {}{}".format(self._url, consts.TUFINSECURETRACK_TEST_CONNECTIVITY_ENDPOINT))
+        self.save_progress(f"Configured URL: {self._url}{consts.TUFINSECURETRACK_TEST_CONNECTIVITY_ENDPOINT}")
 
         # making call
-        ret_value, _ = self._make_rest_call(consts.TUFINSECURETRACK_TEST_CONNECTIVITY_ENDPOINT, action_result,
-                                                   timeout=30)
+        ret_value, _ = self._make_rest_call(consts.TUFINSECURETRACK_TEST_CONNECTIVITY_ENDPOINT, action_result, timeout=30)
 
         # something went wrong
         if phantom.is_fail(ret_value):
@@ -285,7 +279,7 @@ class TufinSecureTrackConnector(BaseConnector):
         return action_result.get_status()
 
     def _lookup_ip(self, param):
-        """ Function that lookup for given IP or subnet.
+        """Function that lookup for given IP or subnet.
 
         :param param: dictionary of input parameters
         :return: status success/failure
@@ -313,16 +307,16 @@ class TufinSecureTrackConnector(BaseConnector):
 
         for network_id, device_id in list(network_ids.items()):
             # Getting rules that IP/subnet falls in
-            res_rule_status, rule_response = self._make_rest_call(consts.TUFINSECURETRACK_NETWORK_RULES_ENDPOINT.format(
-                id=network_id), action_result)
+            res_rule_status, rule_response = self._make_rest_call(
+                consts.TUFINSECURETRACK_NETWORK_RULES_ENDPOINT.format(id=network_id), action_result
+            )
 
             # something went wrong
             if phantom.is_fail(res_rule_status):
                 return action_result.get_status()
 
-            rule = rule_response[consts.TUFINSECURETRACK_REST_RESPONSE]['rules'].get('rule', {})
-            dict_to_list = ['dst_network', 'src_network', 'additional_parameter', 'install', 'dst_service',
-                            'application', 'users']
+            rule = rule_response[consts.TUFINSECURETRACK_REST_RESPONSE]["rules"].get("rule", {})
+            dict_to_list = ["dst_network", "src_network", "additional_parameter", "install", "dst_service", "application", "users"]
 
             if rule and isinstance(rule, dict):
                 rule = [rule]
@@ -334,7 +328,7 @@ class TufinSecureTrackConnector(BaseConnector):
                 if data.get("disabled") is False:
                     rules_list.append(data)
 
-        sorted_rule_list = sorted(rules_list, key=lambda k: k['order'])
+        sorted_rule_list = sorted(rules_list, key=lambda k: k["order"])
 
         if sorted_rule_list:
             if sorted_rule_list[0]["action"].lower() == "accept":
@@ -349,12 +343,12 @@ class TufinSecureTrackConnector(BaseConnector):
             return action_result.set_status(phantom.APP_SUCCESS, consts.TUFINSECURETRACK_NO_FIREWALL_RULE_CONFIGURED)
 
         # Update summary data
-        summary_data['is_blocked'] = is_blocked
-        summary_data['total_rules'] = action_result.get_data_size()
+        summary_data["is_blocked"] = is_blocked
+        summary_data["total_rules"] = action_result.get_data_size()
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _check_connectivity(self, param):
-        """ This function is used to check connectivity between source and destination network.
+        """This function is used to check connectivity between source and destination network.
 
         :param param: dictionary of input parameters
         :return: status success/failure
@@ -380,16 +374,13 @@ class TufinSecureTrackConnector(BaseConnector):
             except:
                 return action_result.set_status(phantom.APP_ERROR, "Invalid port value.")
 
-            if (port < 0):
+            if port < 0:
                 return action_result.set_status(phantom.APP_ERROR, "Port values cannot be negative numbers. Please specify a valid port value.")
 
-            protocol = "{}:{}".format(protocol, port)
+            protocol = f"{protocol}:{port}"
 
         # Set params to get firewall rules that allow traffic
-        params = {"device_ids": "any",
-                  "sources": src_ip,
-                  "destinations": dest_ip,
-                  "services": protocol}
+        params = {"device_ids": "any", "sources": src_ip, "destinations": dest_ip, "services": protocol}
 
         status, is_allowed_traffic = self._get_matching_rule(params, action_result)
 
@@ -402,7 +393,7 @@ class TufinSecureTrackConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _get_matching_rule(self, params, action_result):
-        """ This function is used to get matching rules.
+        """This function is used to get matching rules.
 
         :param params: dictionary of input parameters
         :param action_result: object of ActionResult class
@@ -412,8 +403,7 @@ class TufinSecureTrackConnector(BaseConnector):
         is_allowed_traffic = None
 
         # Querying endpoint to get firewall rule
-        ip_res_status, ip_response = self._make_rest_call(consts.TUFINSECURETRACK_MATCHING_RULE_ENDPOINT, action_result,
-                                                          params=params)
+        ip_res_status, ip_response = self._make_rest_call(consts.TUFINSECURETRACK_MATCHING_RULE_ENDPOINT, action_result, params=params)
 
         # something went wrong
         if phantom.is_fail(ip_res_status):
@@ -421,10 +411,11 @@ class TufinSecureTrackConnector(BaseConnector):
 
         ip_response = ip_response[consts.TUFINSECURETRACK_REST_RESPONSE]
 
-        res_device_and_bindings = ip_response.get(
-            "policy_analysis_query_result", {}).get("devices_and_bindings", {}).get("device_and_bindings", {})
+        res_device_and_bindings = (
+            ip_response.get("policy_analysis_query_result", {}).get("devices_and_bindings", {}).get("device_and_bindings", {})
+        )
 
-        dict_to_list = ['dst_network', 'src_network', 'dst_service', 'application', 'users', 'install']
+        dict_to_list = ["dst_network", "src_network", "dst_service", "application", "users", "install"]
 
         if isinstance(res_device_and_bindings, dict):
             res_device_and_bindings = [res_device_and_bindings]
@@ -450,7 +441,7 @@ class TufinSecureTrackConnector(BaseConnector):
                     if data.get("disabled") is False:
                         rules_list.append(data)
 
-        sorted_rule_list = sorted(rules_list, key=lambda k: k['order'])
+        sorted_rule_list = sorted(rules_list, key=lambda k: k["order"])
 
         is_allowed_traffic = True
         if sorted_rule_list:
@@ -463,7 +454,7 @@ class TufinSecureTrackConnector(BaseConnector):
         return phantom.APP_SUCCESS, is_allowed_traffic
 
     def _get_network_ids(self, ip_address, action_result):
-        """ This function is used to query network object records.
+        """This function is used to query network object records.
 
         :param params: dictionary of input parameters
         :param action_result: object of ActionResult class
@@ -476,83 +467,80 @@ class TufinSecureTrackConnector(BaseConnector):
         if "/" not in ip_address:
             ip_address += "/32"
 
-        for query_param in ['contains', 'contained_in']:
+        for query_param in ["contains", "contained_in"]:
             params = {}
             params.update({"filter": "subnet", query_param: ip_address})
 
-            res_status, response = self._make_rest_call(consts.TUFINSECURETRACK_NETWORK_OBJECT_ENDPOINT, action_result,
-                                                        params=params)
+            res_status, response = self._make_rest_call(consts.TUFINSECURETRACK_NETWORK_OBJECT_ENDPOINT, action_result, params=params)
 
             # something went wrong
             if phantom.is_fail(res_status):
                 return action_result.get_status(), None
 
-            network_object = response[consts.TUFINSECURETRACK_REST_RESPONSE]['network_objects'].get(
-                'network_object', [])
+            network_object = response[consts.TUFINSECURETRACK_REST_RESPONSE]["network_objects"].get("network_object", [])
 
             # Getting network IDs to fetch corresponding rule
             for nw_object in network_object:
                 try:
-                    network_ids.update({nw_object['id']: nw_object["device_id"]})
+                    network_ids.update({nw_object["id"]: nw_object["device_id"]})
                 except:
                     pass
 
             # Handling data more than 100
-            curr_cnt = response[consts.TUFINSECURETRACK_REST_RESPONSE]['network_objects']['count']
-            total = response[consts.TUFINSECURETRACK_REST_RESPONSE]['network_objects']['total']
+            curr_cnt = response[consts.TUFINSECURETRACK_REST_RESPONSE]["network_objects"]["count"]
+            total = response[consts.TUFINSECURETRACK_REST_RESPONSE]["network_objects"]["total"]
 
             while curr_cnt < total:
-                params['start'] = curr_cnt
-                res_status, response = self._make_rest_call(consts.TUFINSECURETRACK_NETWORK_OBJECT_ENDPOINT,
-                                                            action_result, params=params)
+                params["start"] = curr_cnt
+                res_status, response = self._make_rest_call(consts.TUFINSECURETRACK_NETWORK_OBJECT_ENDPOINT, action_result, params=params)
                 # something went wrong
                 if phantom.is_fail(res_status):
                     return action_result.get_status(), None
 
-                network_objects = response[consts.TUFINSECURETRACK_REST_RESPONSE]['network_objects'].get(
-                    'network_object', [])
+                network_objects = response[consts.TUFINSECURETRACK_REST_RESPONSE]["network_objects"].get("network_object", [])
 
                 # Getting network IDs to fetch corresponding rule
                 for nw_object in network_objects:
                     try:
-                        network_ids.update({nw_object['id']: nw_object["device_id"]})
+                        network_ids.update({nw_object["id"]: nw_object["device_id"]})
                     except:
                         pass
 
-                curr_cnt += response[consts.TUFINSECURETRACK_REST_RESPONSE]['network_objects']['count']
+                curr_cnt += response[consts.TUFINSECURETRACK_REST_RESPONSE]["network_objects"]["count"]
 
         return phantom.APP_SUCCESS, network_ids
 
     def handle_action(self, param):
-        """ This function gets current action identifier and calls member function of its own to handle the action.
+        """This function gets current action identifier and calls member function of its own to handle the action.
 
         :param param: dictionary which contains information about the actions to be executed
         :return: status success/failure
         """
 
         # Dictionary mapping each action with its corresponding actions
-        action_mapping = {'test_asset_connectivity': self._test_asset_connectivity,
-                          'check_connectivity': self._check_connectivity,
-                          'lookup_ip': self._lookup_ip}
+        action_mapping = {
+            "test_asset_connectivity": self._test_asset_connectivity,
+            "check_connectivity": self._check_connectivity,
+            "lookup_ip": self._lookup_ip,
+        }
 
         action = self.get_action_identifier()
         try:
             run_action = action_mapping[action]
         except:
-            raise ValueError("action {action} is not supported".format(action=action))
+            raise ValueError(f"action {action} is not supported")
 
         return run_action(param)
 
 
-if __name__ == '__main__':
-
+if __name__ == "__main__":
     import sys
 
     import pudb
 
     pudb.set_trace()
     if len(sys.argv) < 2:
-        print('No test json specified as input')
+        print("No test json specified as input")
         sys.exit(0)
     with open(sys.argv[1]) as f:
         in_json = f.read()

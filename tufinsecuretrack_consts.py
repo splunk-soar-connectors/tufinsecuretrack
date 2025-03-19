@@ -1,6 +1,6 @@
 # File: tufinsecuretrack_consts.py
 #
-# Copyright (c) 2018-2024 Splunk Inc.
+# Copyright (c) 2018-2025 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 # and limitations under the License.
 TUFINSECURETRACK_CONFIG_URL = "url"
 TUFINSECURETRACK_CONFIG_USERNAME = "username"
-TUFINSECURETRACK_CONFIG_PASSWORD = "password"
+TUFINSECURETRACK_CONFIG_PASSWORD = "password"  # pragma: allowlist secret
 TUFINSECURETRACK_CONFIG_VERIFY_SSL = "verify_server_cert"
 TUFINSECURETRACK_ERR_API_UNSUPPORTED_METHOD = "Unsupported method {method}"
 TUFINSECURETRACK_EXCEPTION_OCCURRED = "Exception occurred"
