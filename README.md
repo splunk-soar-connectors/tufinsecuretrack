@@ -1,7 +1,7 @@
 # Tufin SecureTrack
 
 Publisher: Splunk \
-Connector Version: 2.0.7 \
+Connector Version: 2.0.8 \
 Product Vendor: Tufin \
 Product Name: Tufin SecureTrack \
 Minimum Product Version: 4.9.39220
