@@ -156,11 +156,19 @@ class TufinSecureTrackConnector(BaseConnector):
                 f"{self._url}{endpoint}", params=params, auth=(self._username, self._password), verify=self._verify_server_cert, timeout=timeout
             )
 
+            response_content = response.content
+            if len(response_content) > consts.TUFINSECURETRACK_MAX_RESPONSE_BYTES:
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    consts.TUFINSECURETRACK_ERR_RESPONSE_TOO_LARGE,
+                    max_size=consts.TUFINSECURETRACK_MAX_RESPONSE_BYTES,
+                ), response_data
+
             # store the r_text in debug data, it will get dumped in the logs if an error occurs
             if hasattr(action_result, "add_debug_data"):
                 if response is not None:
                     action_result.add_debug_data({"r_status_code": response.status_code})
-                    action_result.add_debug_data({"r_text": response.text})
+                    action_result.add_debug_data({"r_text": response_content[: consts.TUFINSECURETRACK_DEBUG_RESPONSE_BYTES].decode(errors="replace")})
                     action_result.add_debug_data({"r_headers": response.headers})
                 else:
                     action_result.add_debug_data({"r_text": "r is None"})
@@ -176,14 +184,18 @@ class TufinSecureTrackConnector(BaseConnector):
             if "json" in content_type:
                 response_data = response.json()
             elif "xml" in content_type:
-                response_data = xmltodict.parse(response.text)
+                lowered_content = response_content.lower()
+                if b"<!doctype" in lowered_content or b"<!entity" in lowered_content:
+                    return action_result.set_status(phantom.APP_ERROR, consts.TUFINSECURETRACK_ERR_UNSAFE_XML), response_data
+                response_data = xmltodict.parse(response_content)
             elif "html" in content_type:
                 response_data = self._process_html_response(response)
             else:
                 response_data = response.text
         except Exception as e:
             # r.text is guaranteed to be NON None, it will be empty, but not None
-            msg_string = consts.TUFINSECURETRACK_ERR_JSON_PARSE.format(raw_text=response.text)
+            response_preview = response_content[: consts.TUFINSECURETRACK_DEBUG_RESPONSE_BYTES].decode(errors="replace")
+            msg_string = consts.TUFINSECURETRACK_ERR_JSON_PARSE.format(raw_text=response_preview)
             self.debug_print(msg_string, e)
             # set the action_result status to error, the handler function will most probably return as is
             return action_result.set_status(phantom.APP_ERROR, msg_string, e), response_data
