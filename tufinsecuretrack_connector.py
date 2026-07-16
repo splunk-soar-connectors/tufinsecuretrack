@@ -81,7 +81,7 @@ class TufinSecureTrackConnector(BaseConnector):
         self._url = config[consts.TUFINSECURETRACK_CONFIG_URL]
         self._username = config[consts.TUFINSECURETRACK_CONFIG_USERNAME]
         self._password = config[consts.TUFINSECURETRACK_CONFIG_PASSWORD]
-        self._verify_server_cert = config.get(consts.TUFINSECURETRACK_CONFIG_VERIFY_SSL, False)
+        self._verify_server_cert = config.get(consts.TUFINSECURETRACK_CONFIG_VERIFY_SSL, True)
 
         # Custom validation for IP address
         self.set_validator("ip", self._is_ip)

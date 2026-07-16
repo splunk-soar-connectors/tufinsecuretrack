@@ -1,3 +1,3 @@
 **Unreleased**
 
-* chore: establish the Codex vulnerability-remediation baseline.
+* Enable TLS certificate verification by default while retaining an explicit opt-out. [PSAAS-30761]
