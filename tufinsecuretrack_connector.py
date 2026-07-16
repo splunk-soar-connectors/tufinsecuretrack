@@ -501,8 +501,16 @@ class TufinSecureTrackConnector(BaseConnector):
             # Handling data more than 100
             curr_cnt = response[consts.TUFINSECURETRACK_REST_RESPONSE]["network_objects"]["count"]
             total = response[consts.TUFINSECURETRACK_REST_RESPONSE]["network_objects"]["total"]
+            page_count = 1
 
             while curr_cnt < total:
+                if page_count >= consts.TUFINSECURETRACK_MAX_PAGES:
+                    return action_result.set_status(
+                        phantom.APP_ERROR,
+                        consts.TUFINSECURETRACK_ERR_PAGINATION_LIMIT,
+                        max_pages=consts.TUFINSECURETRACK_MAX_PAGES,
+                    ), None
+
                 params["start"] = curr_cnt
                 res_status, response = self._make_rest_call(consts.TUFINSECURETRACK_NETWORK_OBJECT_ENDPOINT, action_result, params=params)
                 # something went wrong
@@ -510,6 +518,9 @@ class TufinSecureTrackConnector(BaseConnector):
                     return action_result.get_status(), None
 
                 network_objects = response[consts.TUFINSECURETRACK_REST_RESPONSE]["network_objects"].get("network_object", [])
+                page_size = response[consts.TUFINSECURETRACK_REST_RESPONSE]["network_objects"]["count"]
+                if not network_objects or page_size <= 0:
+                    return action_result.set_status(phantom.APP_ERROR, consts.TUFINSECURETRACK_ERR_PAGINATION_STALLED), None
 
                 # Getting network IDs to fetch corresponding rule
                 for nw_object in network_objects:
@@ -518,7 +529,11 @@ class TufinSecureTrackConnector(BaseConnector):
                     except:
                         pass
 
-                curr_cnt += response[consts.TUFINSECURETRACK_REST_RESPONSE]["network_objects"]["count"]
+                next_count = curr_cnt + page_size
+                if next_count <= curr_cnt:
+                    return action_result.set_status(phantom.APP_ERROR, consts.TUFINSECURETRACK_ERR_PAGINATION_STALLED), None
+                curr_cnt = next_count
+                page_count += 1
 
         return phantom.APP_SUCCESS, network_ids
 
