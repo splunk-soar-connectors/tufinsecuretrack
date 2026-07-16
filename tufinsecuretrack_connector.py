@@ -69,6 +69,17 @@ class TufinSecureTrackConnector(BaseConnector):
 
         return
 
+    @staticmethod
+    def _classify_rule_action(action):
+        """Return True for permissive actions, False for blocking actions, and None for unknown actions."""
+
+        normalized_action = " ".join(str(action or "").lower().split())
+        if normalized_action in consts.TUFINSECURETRACK_PERMISSIVE_ACTIONS:
+            return True
+        if normalized_action in consts.TUFINSECURETRACK_BLOCKING_ACTIONS:
+            return False
+        return None
+
     def initialize(self):
         """This is an optional function that can be implemented by the AppConnector derived class. Since the
         configuration dictionary is already validated by the time this function is called, it's a good place to do any
@@ -399,7 +410,8 @@ class TufinSecureTrackConnector(BaseConnector):
         if phantom.is_fail(status):
             return action_result.get_status()
 
-        summary_data["allowed_traffic"] = is_allowed_traffic
+        if is_allowed_traffic is not None:
+            summary_data["allowed_traffic"] = is_allowed_traffic
         summary_data["total_rules"] = action_result.get_data_size()
 
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -455,10 +467,15 @@ class TufinSecureTrackConnector(BaseConnector):
 
         sorted_rule_list = sorted(rules_list, key=lambda k: k["order"])
 
-        is_allowed_traffic = True
-        if sorted_rule_list:
-            if not sorted_rule_list[0]["action"].lower() == "accept":
-                is_allowed_traffic = False
+        first_rules_by_device = {}
+        for rule_data in sorted_rule_list:
+            first_rules_by_device.setdefault(rule_data.get("device_id"), rule_data)
+
+        device_verdicts = [self._classify_rule_action(rule_data.get("action")) for rule_data in first_rules_by_device.values()]
+        if any(verdict is True for verdict in device_verdicts):
+            is_allowed_traffic = True
+        elif device_verdicts and all(verdict is False for verdict in device_verdicts):
+            is_allowed_traffic = False
 
         for data in sorted_rule_list:
             action_result.add_data(data)
