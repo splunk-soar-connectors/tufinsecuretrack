@@ -326,7 +326,7 @@ class TufinSecureTrackConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, consts.TUFINSECURETRACK_JSON_INVALID_IP_ADDRESS)
 
         rules_list = []
-        is_blocked = False
+        is_blocked = None
 
         for network_id, device_id in list(network_ids.items()):
             # Getting rules that IP/subnet falls in
@@ -353,11 +353,13 @@ class TufinSecureTrackConnector(BaseConnector):
 
         sorted_rule_list = sorted(rules_list, key=lambda k: k["order"])
 
-        if sorted_rule_list:
-            if sorted_rule_list[0]["action"].lower() == "accept":
-                is_blocked = False
-            else:
-                is_blocked = True
+        first_rules_by_device = {}
+        for rule_data in sorted_rule_list:
+            first_rules_by_device.setdefault(rule_data.get("device_id"), rule_data)
+
+        device_verdicts = [self._classify_rule_action(rule_data.get("action")) for rule_data in first_rules_by_device.values()]
+        if device_verdicts and all(verdict is not None for verdict in device_verdicts):
+            is_blocked = all(verdict is False for verdict in device_verdicts)
 
         for data in sorted_rule_list:
             action_result.add_data(data)
@@ -366,7 +368,8 @@ class TufinSecureTrackConnector(BaseConnector):
             return action_result.set_status(phantom.APP_SUCCESS, consts.TUFINSECURETRACK_NO_FIREWALL_RULE_CONFIGURED)
 
         # Update summary data
-        summary_data["is_blocked"] = is_blocked
+        if is_blocked is not None:
+            summary_data["is_blocked"] = is_blocked
         summary_data["total_rules"] = action_result.get_data_size()
         return action_result.set_status(phantom.APP_SUCCESS)
 
