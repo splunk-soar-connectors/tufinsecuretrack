@@ -1,6 +1,6 @@
 # File: tufinsecuretrack_connector.py
 #
-# Copyright (c) 2018-2025 Splunk Inc.
+# Copyright (c) 2018-2026 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -179,7 +179,9 @@ class TufinSecureTrackConnector(BaseConnector):
             if hasattr(action_result, "add_debug_data"):
                 if response is not None:
                     action_result.add_debug_data({"r_status_code": response.status_code})
-                    action_result.add_debug_data({"r_text": response_content[: consts.TUFINSECURETRACK_DEBUG_RESPONSE_BYTES].decode(errors="replace")})
+                    action_result.add_debug_data(
+                        {"r_text": response_content[: consts.TUFINSECURETRACK_DEBUG_RESPONSE_BYTES].decode(errors="replace")}
+                    )
                     action_result.add_debug_data({"r_headers": response.headers})
                 else:
                     action_result.add_debug_data({"r_text": "r is None"})

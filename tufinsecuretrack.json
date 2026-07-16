@@ -4,7 +4,7 @@
     "description": "This app supports investigative actions on Tufin SecureTrack",
     "publisher": "Splunk",
     "package_name": "phantom_tufinsecuretrack",
-    "license": "Copyright (c) 2018-2025 Splunk Inc.",
+    "license": "Copyright (c) 2018-2026 Splunk Inc.",
     "main_module": "tufinsecuretrack_connector.py",
     "type": "network security",
     "app_version": "2.0.8",
@@ -2076,5 +2076,11 @@
             ],
             "versions": "EQ(*)"
         }
-    ]
+    ],
+    "pip39_dependencies": {
+        "wheel": []
+    },
+    "pip313_dependencies": {
+        "wheel": []
+    }
 }
