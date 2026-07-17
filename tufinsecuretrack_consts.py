@@ -1,6 +1,6 @@
 # File: tufinsecuretrack_consts.py
 #
-# Copyright (c) 2018-2025 Splunk Inc.
+# Copyright (c) 2018-2026 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,15 @@ TUFINSECURETRACK_ERR_API_UNSUPPORTED_METHOD = "Unsupported method {method}"
 TUFINSECURETRACK_EXCEPTION_OCCURRED = "Exception occurred"
 TUFINSECURETRACK_ERR_SERVER_CONNECTION = "Connection failed"
 TUFINSECURETRACK_ERR_JSON_PARSE = "Unable to parse the response into a dictionary.\nResponse text - {raw_text}"
+TUFINSECURETRACK_ERR_RESPONSE_TOO_LARGE = "Response exceeded the maximum supported size of {max_size} bytes"
+TUFINSECURETRACK_ERR_UNSAFE_XML = "XML response contains a prohibited document type or entity declaration"
+TUFINSECURETRACK_MAX_RESPONSE_BYTES = 20 * 1024 * 1024
+TUFINSECURETRACK_DEBUG_RESPONSE_BYTES = 4096
+TUFINSECURETRACK_MAX_PAGES = 1000
+TUFINSECURETRACK_ERR_PAGINATION_STALLED = "Network object pagination did not advance"
+TUFINSECURETRACK_ERR_PAGINATION_LIMIT = "Network object pagination exceeded the {max_pages}-page safety limit"
+TUFINSECURETRACK_PERMISSIVE_ACTIONS = {"accept", "allow", "permit", "continue", "inline layer"}
+TUFINSECURETRACK_BLOCKING_ACTIONS = {"drop", "deny", "reject", "block"}
 TUFINSECURETRACK_ERR_FROM_SERVER = "API failed.\nStatus code: {status}\nDetail: {detail}"
 TUFINSECURETRACK_REST_RESPONSE = "response"
 TUFINSECURETRACK_REST_RESP_OTHER_ERR_MSG = "Error returned"

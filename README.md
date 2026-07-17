@@ -1,9 +1,9 @@
 # Tufin SecureTrack
 
-Publisher: Splunk \
-Connector Version: 2.0.8 \
-Product Vendor: Tufin \
-Product Name: Tufin SecureTrack \
+Publisher: Splunk <br>
+Connector Version: 2.0.8 <br>
+Product Vendor: Tufin <br>
+Product Name: Tufin SecureTrack <br>
 Minimum Product Version: 4.9.39220
 
 This app supports investigative actions on Tufin SecureTrack
@@ -21,15 +21,15 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 
 ### Supported Actions
 
-[test connectivity](#action-test-connectivity) - Validate credentials provided for connectivity \
-[lookup ip](#action-lookup-ip) - Lookup IP/CIDR info \
+[test connectivity](#action-test-connectivity) - Validate credentials provided for connectivity <br>
+[lookup ip](#action-lookup-ip) - Lookup IP/CIDR info <br>
 [trace route](#action-trace-route) - Check connectivity between source and destination network
 
 ## action: 'test connectivity'
 
 Validate credentials provided for connectivity
 
-Type: **test** \
+Type: **test** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -44,10 +44,10 @@ No Output
 
 Lookup IP/CIDR info
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
-This action can also be used to check if the specified IP is blocked by testing the value of the <b>action_result.summary.is_blocked</b> response data path.
+This action can also be used to check if the specified IP is blocked by testing the value of the <b>action_result.summary.is_blocked</b> response data path. The summary is true only when the first matching rule on every returned device is explicitly blocking; it is omitted when a device action cannot be classified.
 
 #### Action Parameters
 
@@ -212,7 +212,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Check connectivity between source and destination network
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 One of the <b>source_ip</b> or <b>destination_ip</b> parameters need to be specified. If <b>source_ip</b> or <b>destination_ip</b> parameter is not specified, the action will use 'Any'. This action returns a list of all enabled rules, which matches the specified source and destination network. The rules are sorted according to rule order. <br/>Supported <b>protocol</b>: <ul><li>Any</li><li>TCP</li><li>UDP</li><li>ICMP</li></ul>.
@@ -393,7 +393,7 @@ ______________________________________________________________________
 
 Auto-generated Splunk SOAR Connector documentation.
 
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

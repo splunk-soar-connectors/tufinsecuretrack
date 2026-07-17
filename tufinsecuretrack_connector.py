@@ -1,6 +1,6 @@
 # File: tufinsecuretrack_connector.py
 #
-# Copyright (c) 2018-2025 Splunk Inc.
+# Copyright (c) 2018-2026 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -69,6 +69,17 @@ class TufinSecureTrackConnector(BaseConnector):
 
         return
 
+    @staticmethod
+    def _classify_rule_action(action):
+        """Return True for permissive actions, False for blocking actions, and None for unknown actions."""
+
+        normalized_action = " ".join(str(action or "").lower().split())
+        if normalized_action in consts.TUFINSECURETRACK_PERMISSIVE_ACTIONS:
+            return True
+        if normalized_action in consts.TUFINSECURETRACK_BLOCKING_ACTIONS:
+            return False
+        return None
+
     def initialize(self):
         """This is an optional function that can be implemented by the AppConnector derived class. Since the
         configuration dictionary is already validated by the time this function is called, it's a good place to do any
@@ -81,7 +92,7 @@ class TufinSecureTrackConnector(BaseConnector):
         self._url = config[consts.TUFINSECURETRACK_CONFIG_URL]
         self._username = config[consts.TUFINSECURETRACK_CONFIG_USERNAME]
         self._password = config[consts.TUFINSECURETRACK_CONFIG_PASSWORD]
-        self._verify_server_cert = config.get(consts.TUFINSECURETRACK_CONFIG_VERIFY_SSL, False)
+        self._verify_server_cert = config.get(consts.TUFINSECURETRACK_CONFIG_VERIFY_SSL, True)
 
         # Custom validation for IP address
         self.set_validator("ip", self._is_ip)
@@ -156,11 +167,21 @@ class TufinSecureTrackConnector(BaseConnector):
                 f"{self._url}{endpoint}", params=params, auth=(self._username, self._password), verify=self._verify_server_cert, timeout=timeout
             )
 
+            response_content = response.content
+            if len(response_content) > consts.TUFINSECURETRACK_MAX_RESPONSE_BYTES:
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    consts.TUFINSECURETRACK_ERR_RESPONSE_TOO_LARGE,
+                    max_size=consts.TUFINSECURETRACK_MAX_RESPONSE_BYTES,
+                ), response_data
+
             # store the r_text in debug data, it will get dumped in the logs if an error occurs
             if hasattr(action_result, "add_debug_data"):
                 if response is not None:
                     action_result.add_debug_data({"r_status_code": response.status_code})
-                    action_result.add_debug_data({"r_text": response.text})
+                    action_result.add_debug_data(
+                        {"r_text": response_content[: consts.TUFINSECURETRACK_DEBUG_RESPONSE_BYTES].decode(errors="replace")}
+                    )
                     action_result.add_debug_data({"r_headers": response.headers})
                 else:
                     action_result.add_debug_data({"r_text": "r is None"})
@@ -176,14 +197,18 @@ class TufinSecureTrackConnector(BaseConnector):
             if "json" in content_type:
                 response_data = response.json()
             elif "xml" in content_type:
-                response_data = xmltodict.parse(response.text)
+                lowered_content = response_content.lower()
+                if b"<!doctype" in lowered_content or b"<!entity" in lowered_content:
+                    return action_result.set_status(phantom.APP_ERROR, consts.TUFINSECURETRACK_ERR_UNSAFE_XML), response_data
+                response_data = xmltodict.parse(response_content)
             elif "html" in content_type:
                 response_data = self._process_html_response(response)
             else:
                 response_data = response.text
         except Exception as e:
             # r.text is guaranteed to be NON None, it will be empty, but not None
-            msg_string = consts.TUFINSECURETRACK_ERR_JSON_PARSE.format(raw_text=response.text)
+            response_preview = response_content[: consts.TUFINSECURETRACK_DEBUG_RESPONSE_BYTES].decode(errors="replace")
+            msg_string = consts.TUFINSECURETRACK_ERR_JSON_PARSE.format(raw_text=response_preview)
             self.debug_print(msg_string, e)
             # set the action_result status to error, the handler function will most probably return as is
             return action_result.set_status(phantom.APP_ERROR, msg_string, e), response_data
@@ -303,7 +328,7 @@ class TufinSecureTrackConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, consts.TUFINSECURETRACK_JSON_INVALID_IP_ADDRESS)
 
         rules_list = []
-        is_blocked = False
+        is_blocked = None
 
         for network_id, device_id in list(network_ids.items()):
             # Getting rules that IP/subnet falls in
@@ -330,11 +355,13 @@ class TufinSecureTrackConnector(BaseConnector):
 
         sorted_rule_list = sorted(rules_list, key=lambda k: k["order"])
 
-        if sorted_rule_list:
-            if sorted_rule_list[0]["action"].lower() == "accept":
-                is_blocked = False
-            else:
-                is_blocked = True
+        first_rules_by_device = {}
+        for rule_data in sorted_rule_list:
+            first_rules_by_device.setdefault(rule_data.get("device_id"), rule_data)
+
+        device_verdicts = [self._classify_rule_action(rule_data.get("action")) for rule_data in first_rules_by_device.values()]
+        if device_verdicts and all(verdict is not None for verdict in device_verdicts):
+            is_blocked = all(verdict is False for verdict in device_verdicts)
 
         for data in sorted_rule_list:
             action_result.add_data(data)
@@ -343,7 +370,8 @@ class TufinSecureTrackConnector(BaseConnector):
             return action_result.set_status(phantom.APP_SUCCESS, consts.TUFINSECURETRACK_NO_FIREWALL_RULE_CONFIGURED)
 
         # Update summary data
-        summary_data["is_blocked"] = is_blocked
+        if is_blocked is not None:
+            summary_data["is_blocked"] = is_blocked
         summary_data["total_rules"] = action_result.get_data_size()
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -387,7 +415,8 @@ class TufinSecureTrackConnector(BaseConnector):
         if phantom.is_fail(status):
             return action_result.get_status()
 
-        summary_data["allowed_traffic"] = is_allowed_traffic
+        if is_allowed_traffic is not None:
+            summary_data["allowed_traffic"] = is_allowed_traffic
         summary_data["total_rules"] = action_result.get_data_size()
 
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -443,10 +472,15 @@ class TufinSecureTrackConnector(BaseConnector):
 
         sorted_rule_list = sorted(rules_list, key=lambda k: k["order"])
 
-        is_allowed_traffic = True
-        if sorted_rule_list:
-            if not sorted_rule_list[0]["action"].lower() == "accept":
-                is_allowed_traffic = False
+        first_rules_by_device = {}
+        for rule_data in sorted_rule_list:
+            first_rules_by_device.setdefault(rule_data.get("device_id"), rule_data)
+
+        device_verdicts = [self._classify_rule_action(rule_data.get("action")) for rule_data in first_rules_by_device.values()]
+        if any(verdict is True for verdict in device_verdicts):
+            is_allowed_traffic = True
+        elif device_verdicts and all(verdict is False for verdict in device_verdicts):
+            is_allowed_traffic = False
 
         for data in sorted_rule_list:
             action_result.add_data(data)
@@ -489,8 +523,16 @@ class TufinSecureTrackConnector(BaseConnector):
             # Handling data more than 100
             curr_cnt = response[consts.TUFINSECURETRACK_REST_RESPONSE]["network_objects"]["count"]
             total = response[consts.TUFINSECURETRACK_REST_RESPONSE]["network_objects"]["total"]
+            page_count = 1
 
             while curr_cnt < total:
+                if page_count >= consts.TUFINSECURETRACK_MAX_PAGES:
+                    return action_result.set_status(
+                        phantom.APP_ERROR,
+                        consts.TUFINSECURETRACK_ERR_PAGINATION_LIMIT,
+                        max_pages=consts.TUFINSECURETRACK_MAX_PAGES,
+                    ), None
+
                 params["start"] = curr_cnt
                 res_status, response = self._make_rest_call(consts.TUFINSECURETRACK_NETWORK_OBJECT_ENDPOINT, action_result, params=params)
                 # something went wrong
@@ -498,6 +540,9 @@ class TufinSecureTrackConnector(BaseConnector):
                     return action_result.get_status(), None
 
                 network_objects = response[consts.TUFINSECURETRACK_REST_RESPONSE]["network_objects"].get("network_object", [])
+                page_size = response[consts.TUFINSECURETRACK_REST_RESPONSE]["network_objects"]["count"]
+                if not network_objects or page_size <= 0:
+                    return action_result.set_status(phantom.APP_ERROR, consts.TUFINSECURETRACK_ERR_PAGINATION_STALLED), None
 
                 # Getting network IDs to fetch corresponding rule
                 for nw_object in network_objects:
@@ -506,7 +551,11 @@ class TufinSecureTrackConnector(BaseConnector):
                     except:
                         pass
 
-                curr_cnt += response[consts.TUFINSECURETRACK_REST_RESPONSE]["network_objects"]["count"]
+                next_count = curr_cnt + page_size
+                if next_count <= curr_cnt:
+                    return action_result.set_status(phantom.APP_ERROR, consts.TUFINSECURETRACK_ERR_PAGINATION_STALLED), None
+                curr_cnt = next_count
+                page_count += 1
 
         return phantom.APP_SUCCESS, network_ids
 

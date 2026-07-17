@@ -4,7 +4,7 @@
     "description": "This app supports investigative actions on Tufin SecureTrack",
     "publisher": "Splunk",
     "package_name": "phantom_tufinsecuretrack",
-    "license": "Copyright (c) 2018-2025 Splunk Inc.",
+    "license": "Copyright (c) 2018-2026 Splunk Inc.",
     "main_module": "tufinsecuretrack_connector.py",
     "type": "network security",
     "app_version": "2.0.8",
@@ -31,7 +31,7 @@
             "description": "Verify server certificate",
             "data_type": "boolean",
             "order": 1,
-            "default": false
+            "default": true
         },
         "username": {
             "required": true,
@@ -60,7 +60,7 @@
         {
             "action": "lookup ip",
             "description": "Lookup IP/CIDR info",
-            "verbose": "This action can also be used to check if the specified IP is blocked by testing the value of the <b>action_result.summary.is_blocked</b> response data path.",
+            "verbose": "This action can also be used to check if the specified IP is blocked by testing the value of the <b>action_result.summary.is_blocked</b> response data path. The summary is true only when the first matching rule on every returned device is explicitly blocking; it is omitted when a device action cannot be classified.",
             "type": "investigate",
             "identifier": "lookup_ip",
             "read_only": true,
@@ -2076,5 +2076,11 @@
             ],
             "versions": "EQ(*)"
         }
-    ]
+    ],
+    "pip39_dependencies": {
+        "wheel": []
+    },
+    "pip313_dependencies": {
+        "wheel": []
+    }
 }
